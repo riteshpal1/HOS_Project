@@ -1,0 +1,10 @@
+body{
+  background:#e9eef3;
+}
+button{
+  background:green;
+  color:white;
+  border:none;
+  padding:10px;
+  cursor:pointer;
+}
