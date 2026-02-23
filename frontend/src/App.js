@@ -25,8 +25,7 @@ function App() {
 
   const submit = async () => {
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/plan-trip/",
+      const res = await axios.post("https://hos-project.onrender.com/api/plan-trip/",
         {
           current_location: form.current,
           pickup_location: form.pickup,
