@@ -1,38 +1,136 @@
-.App {
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f3f4f6;
+}
+
+.header {
+  background: #1e3a8a;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.app {
+  padding: 30px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.dashboard {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 30px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.form-card {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 12px;
+}
+
+.map-card {
+  flex: 2;
+}
+
+select, input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
   color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background: #1d4ed8;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat-box {
+  flex: 1;
+  background: #e0e7ff;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-box strong {
+  display: block;
+  font-size: 18px;
+  margin-top: 5px;
+}
+
+.map {
+  height: 320px;
+  border-radius: 10px;
+}
+
+.logs-section {
+  margin-top: 30px;
+}
+
+.eld-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.eld-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(24, 1fr);
+}
+
+.hour-label {
+  border: 1px solid #ccc;
+  font-size: 10px;
+  text-align: center;
+}
+
+.row-label {
+  border: 1px solid black;
+  font-size: 12px;
+  text-align: center;
+}
+
+.grid-cell {
+  border: 1px solid #ddd;
+  height: 16px;
+}
+
+.eld-summary {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    flex-direction: column;
   }
-  to {
-    transform: rotate(360deg);
+
+  .map {
+    height: 250px;
   }
 }

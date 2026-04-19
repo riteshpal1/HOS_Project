@@ -2,6 +2,20 @@ import React, { useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "./App.css";
+import L from "leaflet";
+
+// FIX Leaflet marker issue
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+});
 
 function App() {
 
@@ -15,17 +29,19 @@ function App() {
   const [result, setResult] = useState(null);
 
   const cities = [
-    "Delhi",
-    "Mumbai",
-    "Bangalore",
-    "Chennai",
-    "Hyderabad",
-    "Kolkata"
+    "Delhi","Mumbai","Bangalore","Chennai","Hyderabad",
+    "Kolkata","Ahmedabad","Pune","Jaipur","Lucknow","Chandigarh"
   ];
 
   const submit = async () => {
+    if (!form.current || !form.pickup || !form.dropoff || !form.cycle) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      const res = await axios.post("https://hos-project.onrender.com/api/plan-trip/",
+      const res = await axios.post(
+        "https://hos-project.onrender.com/api/plan-trip/",
         {
           current_location: form.current,
           pickup_location: form.pickup,
@@ -33,149 +49,175 @@ function App() {
           cycle_used: form.cycle
         }
       );
-
       setResult(res.data);
-    } catch (err) {
-      alert("Backend Error. Check Django terminal.");
+    } catch {
+      alert("Backend Error. Make sure Render backend is awake.");
     }
   };
 
-  // =======================
-  // ELD GRID COMPONENT
-  // =======================
-
+  // ================= ELD GRID =================
   const ELDGrid = ({ log }) => {
-
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     return (
-      <div style={{
-        border: "2px solid black",
-        margin: "20px 0",
-        padding: "10px"
-      }}>
-        <h3>Day {log.day}</h3>
+      <div className="card shadow p-3 mb-3">
+        <h5>Day {log.day}</h5>
 
-        <div style={{ display: "grid", gridTemplateColumns: "100px repeat(24, 1fr)" }}>
+        <div className="eld-grid">
 
-          {/* Header Row */}
           <div></div>
           {hours.map(h => (
-            <div key={h} style={{
-              border: "1px solid #ccc",
-              fontSize: 10,
-              textAlign: "center"
-            }}>
-              {h}
-            </div>
+            <div key={h} className="hour-label">{h}</div>
           ))}
 
-          {/* Off Duty */}
-          <div style={{ border: "1px solid black" }}>Off Duty</div>
+          <div className="row-label">Off</div>
           {hours.map(h => (
-            <div key={h} style={{
-              border: "1px solid #ddd",
-              backgroundColor: h >= log.on_duty_hours ? "#c8f7c5" : "white"
-            }} />
+            <div key={h}
+              className="grid-cell"
+              style={{ backgroundColor: h >= log.on_duty_hours ? "#d1fae5" : "white" }}
+            />
           ))}
 
-          {/* Driving */}
-          <div style={{ border: "1px solid black" }}>Driving</div>
+          <div className="row-label">Drive</div>
           {hours.map(h => (
-            <div key={h} style={{
-              border: "1px solid #ddd",
-              backgroundColor: h < log.driving_hours ? "#ff7675" : "white"
-            }} />
+            <div key={h}
+              className="grid-cell"
+              style={{ backgroundColor: h < log.driving_hours ? "#fecaca" : "white" }}
+            />
           ))}
 
-          {/* On Duty (Not Driving) */}
-          <div style={{ border: "1px solid black" }}>On Duty</div>
+          <div className="row-label">On Duty</div>
           {hours.map(h => (
-            <div key={h} style={{
-              border: "1px solid #ddd",
-              backgroundColor:
-                h < log.on_duty_hours && h >= log.driving_hours
-                  ? "#74b9ff"
-                  : "white"
-            }} />
+            <div key={h}
+              className="grid-cell"
+              style={{
+                backgroundColor:
+                  h < log.on_duty_hours && h >= log.driving_hours
+                    ? "#bfdbfe"
+                    : "white"
+              }}
+            />
           ))}
 
         </div>
 
-        <div style={{ marginTop: 10 }}>
-          Driving: {log.driving_hours} hrs |
-          On Duty: {log.on_duty_hours} hrs |
-          Off Duty: {log.off_duty_hours} hrs
+        <div className="mt-2">
+          Driving: {log.driving_hours}h | On Duty: {log.on_duty_hours}h | Off: {log.off_duty_hours}h
         </div>
-
       </div>
     );
   };
 
-  // =======================
-
   return (
-    <div style={{ padding: 20 }}>
+    <div className="container-fluid p-4">
 
-      <h1>HOS Compliance Planner</h1>
+      {/* HEADER */}
+      <h2 className="text-center mb-4 fw-bold">
+        🚛 HOS Compliance Planner
+      </h2>
 
-      <div style={{ marginBottom: 20 }}>
+      <div className="row g-4">
 
-        <select onChange={e => setForm({ ...form, current: e.target.value })}>
-          <option>Select Current City</option>
-          {cities.map(city => <option key={city}>{city}</option>)}
-        </select>
+        {/* LEFT PANEL */}
+        <div className="col-md-4">
+          <div className="card shadow p-3">
 
-        <br /><br />
+            <h5 className="mb-3">Trip Details</h5>
 
-        <select onChange={e => setForm({ ...form, pickup: e.target.value })}>
-          <option>Select Pickup City</option>
-          {cities.map(city => <option key={city}>{city}</option>)}
-        </select>
+            <select
+              className="form-select mb-3"
+              value={form.current}
+              onChange={e => setForm({ ...form, current: e.target.value })}
+            >
+              <option value="">Current City</option>
+              {cities.map(city => <option key={city}>{city}</option>)}
+            </select>
 
-        <br /><br />
+            <select
+              className="form-select mb-3"
+              value={form.pickup}
+              onChange={e => setForm({ ...form, pickup: e.target.value })}
+            >
+              <option value="">Pickup City</option>
+              {cities.map(city => <option key={city}>{city}</option>)}
+            </select>
 
-        <select onChange={e => setForm({ ...form, dropoff: e.target.value })}>
-          <option>Select Dropoff City</option>
-          {cities.map(city => <option key={city}>{city}</option>)}
-        </select>
+            <select
+              className="form-select mb-3"
+              value={form.dropoff}
+              onChange={e => setForm({ ...form, dropoff: e.target.value })}
+            >
+              <option value="">Dropoff City</option>
+              {cities.map(city => <option key={city}>{city}</option>)}
+            </select>
 
-        <br /><br />
+            <input
+              type="number"
+              className="form-control mb-3"
+              placeholder="Cycle Used (hrs)"
+              value={form.cycle}
+              onChange={e => setForm({ ...form, cycle: e.target.value })}
+            />
 
-        <input
-          placeholder="Current Cycle Used (hrs)"
-          onChange={e => setForm({ ...form, cycle: e.target.value })}
-        />
+            <button className="btn btn-primary w-100" onClick={submit}>
+              Plan Trip
+            </button>
 
-        <br /><br />
+          </div>
+        </div>
 
-        <button onClick={submit}>Plan Trip</button>
+        {/* RIGHT PANEL */}
+        <div className="col-md-8">
+          <div className="card shadow p-3">
+
+            {result ? (
+              <>
+                {/* STATS */}
+                <div className="row text-center mb-3">
+                  <div className="col">
+                    <div className="bg-light p-2 rounded">
+                      <small>Total Miles</small>
+                      <h5>{result.total_miles}</h5>
+                    </div>
+                  </div>
+                  <div className="col">
+                    <div className="bg-light p-2 rounded">
+                      <small>Fuel Stops</small>
+                      <h5>{result.fuel_stops}</h5>
+                    </div>
+                  </div>
+                </div>
+
+                <MapContainer
+                  center={result.route?.[0] || [28.61, 77.20]}
+                  zoom={6}
+                  style={{ height: "350px", borderRadius: "10px" }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Polyline positions={result.route} />
+                </MapContainer>
+              </>
+            ) : (
+              <p className="text-center text-muted mt-5">
+                Plan a trip to see route and stats
+              </p>
+            )}
+
+          </div>
+        </div>
+
       </div>
 
+      {/* LOGS */}
       {result && (
-        <>
-          <h2>Total Miles: {result.total_miles}</h2>
-          <h3>Fuel Stops: {result.fuel_stops}</h3>
-
-          {/* MAP */}
-          <MapContainer
-            center={result.route[0]}
-            zoom={6}
-            style={{ height: 400, marginBottom: 20 }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Polyline positions={result.route} />
-          </MapContainer>
-
-          {/* LOG SHEETS */}
-          <h2>Daily Log Sheets</h2>
-
+        <div className="mt-4">
+          <h4>Daily Log Sheets</h4>
           {result.logs.map(log => (
             <ELDGrid key={log.day} log={log} />
           ))}
-        </>
+        </div>
       )}
 
     </div>

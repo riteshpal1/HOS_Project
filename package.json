@@ -1,7 +1,10 @@
 {
   "dependencies": {
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
+    "bootstrap": "^5.3.8",
+    "bootstrapp": "^0.0.0",
     "leaflet": "^1.9.4",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "react-scripts": "^5.0.1"
   }
 }
